@@ -1,113 +1,117 @@
-﻿using FUST.ECommerce.Data;
-using MySqlConnector;
-using Pomelo.EntityFrameworkCore.MySql;
+﻿using MySqlConnector;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
 
-public class ProductService
+namespace FUST.ECommerce.Service
 {
-    private readonly string _connectionString;
-
-    public ProductService(string connectionString)
+    public class ProductService
     {
-        _connectionString = connectionString;
-    }
+        private readonly string _connectionString;
 
-    public async Task<List<Product>> GetProductsAsync()
-    {
-        var products = new List<Product>();
-        using (var connection = new MySqlConnection(_connectionString))
+        public ProductService(string connectionString)
         {
-            await connection.OpenAsync();
-            using (var command = new MySqlCommand("SELECT * FROM Products", connection))
+            _connectionString = connectionString;
+        }
+
+        public async Task<List<Product>> GetProductsAsync()
+        {
+            var products = new List<Product>();
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                using (var reader = await command.ExecuteReaderAsync())
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand("SELECT * FROM prodotti", connection))
                 {
-                    while (await reader.ReadAsync())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        products.Add(new Product
+                        while (await reader.ReadAsync())
                         {
-                            Id = reader.GetInt32("Id"),
-                            Name = reader.GetString("Name"),
-                            Description = reader.GetString("Description"),
-                            Price = reader.GetDecimal("Price"),
-                            CategoryId = reader.GetInt32("CategoryId")
-                        });
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32("id"),
+                                Name = reader.GetString("nome"),
+                                Description = reader.IsDBNull("descrizione") ? null : reader.GetString("descrizione"),
+                                Price = reader.GetDecimal("prezzo"),
+                                CategoryId = reader.GetInt32("categoria_id")
+                            });
+                        }
                     }
                 }
             }
+            return products;
         }
-        return products;
-    }
 
-    public async Task<Product?> GetProductByIdAsync(int id)
-    {
-        Product? product = null;
-        using (var connection = new MySqlConnection(_connectionString))
+        public async Task<Product?> GetProductByIdAsync(int id)
         {
-            await connection.OpenAsync();
-            using (var command = new MySqlCommand("SELECT * FROM Products WHERE Id = @Id", connection))
+            Product? product = null;
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                command.Parameters.AddWithValue("@Id", id);
-                using (var reader = await command.ExecuteReaderAsync())
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand("SELECT * FROM prodotti WHERE id = @Id", connection))
                 {
-                    if (await reader.ReadAsync())
+                    command.Parameters.AddWithValue("@Id", id);
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        product = new Product
+                        if (await reader.ReadAsync())
                         {
-                            Id = reader.GetInt32("Id"),
-                            Name = reader.GetString("Name"),
-                            Description = reader.GetString("Description"),
-                            Price = reader.GetDecimal("Price"),
-                            CategoryId = reader.GetInt32("CategoryId")
-                        };
+                            product = new Product
+                            {
+                                Id = reader.GetInt32("id"),
+                                Name = reader.GetString("nome"),
+                                Description = reader.IsDBNull("descrizione") ? null : reader.GetString("descrizione"),
+                                Price = reader.GetDecimal("prezzo"),
+                                CategoryId = reader.GetInt32("categoria_id")
+                            };
+                        }
                     }
                 }
             }
+            return product;
         }
-        return product;
-    }
 
-    public async Task AddProductAsync(Product product)
-    {
-        using (var connection = new MySqlConnection(_connectionString))
+        public async Task AddProductAsync(Product product)
         {
-            await connection.OpenAsync();
-            using (var command = new MySqlCommand("INSERT INTO Products (Name, Description, Price, CategoryId) VALUES (@Name, @Description, @Price, @CategoryId)", connection))
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                command.Parameters.AddWithValue("@Name", product.Name);
-                command.Parameters.AddWithValue("@Description", product.Description);
-                command.Parameters.AddWithValue("@Price", product.Price);
-                command.Parameters.AddWithValue("@CategoryId", product.CategoryId);
-                await command.ExecuteNonQueryAsync();
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand("INSERT INTO prodotti (nome, descrizione, prezzo, categoria_id) VALUES (@Nome, @Descrizione, @Prezzo, @CategoriaId)", connection))
+                {
+                    command.Parameters.AddWithValue("@Nome", product.Name);
+                    command.Parameters.AddWithValue("@Descrizione", product.Description ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Prezzo", product.Price);
+                    command.Parameters.AddWithValue("@CategoriaId", product.CategoryId);
+                    await command.ExecuteNonQueryAsync();
+                }
             }
         }
-    }
 
-    public async Task UpdateProductAsync(Product product)
-    {
-        using (var connection = new MySqlConnection(_connectionString))
+        public async Task UpdateProductAsync(Product product)
         {
-            await connection.OpenAsync();
-            using (var command = new MySqlCommand("UPDATE Products SET Name = @Name, Description = @Description, Price = @Price, CategoryId = @CategoryId WHERE Id = @Id", connection))
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                command.Parameters.AddWithValue("@Id", product.Id);
-                command.Parameters.AddWithValue("@Name", product.Name);
-                command.Parameters.AddWithValue("@Description", product.Description);
-                command.Parameters.AddWithValue("@Price", product.Price);
-                command.Parameters.AddWithValue("@CategoryId", product.CategoryId);
-                await command.ExecuteNonQueryAsync();
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand("UPDATE prodotti SET nome = @Nome, descrizione = @Descrizione, prezzo = @Prezzo, categoria_id = @CategoriaId WHERE id = @Id", connection))
+                {
+                    command.Parameters.AddWithValue("@Id", product.Id);
+                    command.Parameters.AddWithValue("@Nome", product.Name);
+                    command.Parameters.AddWithValue("@Descrizione", product.Description ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Prezzo", product.Price);
+                    command.Parameters.AddWithValue("@CategoriaId", product.CategoryId);
+                    await command.ExecuteNonQueryAsync();
+                }
             }
         }
-    }
 
-    public async Task DeleteProductAsync(int id)
-    {
-        using (var connection = new MySqlConnection(_connectionString))
+        public async Task DeleteProductAsync(int id)
         {
-            await connection.OpenAsync();
-            using (var command = new MySqlCommand("DELETE FROM Products WHERE Id = @Id", connection))
+            using (var connection = new MySqlConnection(_connectionString))
             {
-                command.Parameters.AddWithValue("@Id", id);
-                await command.ExecuteNonQueryAsync();
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand("DELETE FROM prodotti WHERE id = @Id", connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    await command.ExecuteNonQueryAsync();
+                }
             }
         }
     }
