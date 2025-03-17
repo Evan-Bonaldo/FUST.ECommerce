@@ -1,0 +1,35 @@
+﻿@page "/admin/users/edit"
+@using FUST.ECommerce.Models
+<h3>Modifica utente</h3>
+<form id="frmEdit" method="post" action="/admin/users">
+    <div class="row" id="editName">
+        <label>Original Name: </label>
+        <input type="text" disabled value="@editUser.Name" />
+        <br />
+        <label>New Name: </label>
+        <input id="idName" type="text" value="@editUser.Name" />
+        <br />
+    </div>
+    <div class="row" id="editSurname">
+        <label>Original Surname: </label>
+        <input type="text" disabled value="@editUser.Surname" />
+        <br />
+        <label>New Surname: </label>
+        <input id="idSurn" type="text" value="@editUser.Surname" />
+        <br />
+    </div>
+    <div class="row" id="editEMail">
+        <label>Original E-Mail: </label>
+        <input id="idMail" type="text" disabled value="@editUser.EMail" />
+        <br />
+        <label>New E-mail: </label>
+        <input type="text" value="@editUser.EMail" />
+        <br />
+    </div>
+    <button class="btn btn-primary" type="submit">Salva</button>
+    <a type="btn btn-secondary" href="/admin/users">Annulla</a>
+</form>
+
+@code {
+    User editUser = new User();
+}
