@@ -1,0 +1,28 @@
+﻿@page "/admin/users/register"
+<h3>Register</h3>
+<form method="post" action="/account/login" id="frmReg">
+    <label>Name: </label>
+    <input type="text" @bind="name"/>
+    <br />
+    <label>Surname: </label>
+    <input type="text" @bind="surname" />
+    <br />
+    <label>E-Mail: </label>
+    <input type="text" @bind="mail" />
+    <br />
+    <label>Confirm E-Mail: </label>
+    <input type="text" @bind="confMail" />
+    <br />
+    <label>Password:</label>
+    <input @bind="pass" type="password"/>
+    <br />
+    <button class="btn btn-primary" type="submit">Salva</button>
+</form>
+@code {
+    string name = "";
+    string surname = "";
+    string mail = "";
+    string confMail = "";
+    string pass = "";
+    //inserimento database
+}

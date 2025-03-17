@@ -1,0 +1,27 @@
+﻿@page "/admin/users/list"
+@using FUST.ECommerce.Models
+<h3>Lista degli utenti</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>E-Mail</th>
+                    <th>Data di Registrazione</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in list){
+                    <tr>
+                        <th>item.Name</th>
+                        <th>item.Surname</th>
+                        <th>item.EMail</th>
+                        <th>item.RegistrationDate</th>
+                    </tr>
+                }
+            </tbody>
+        </table>
+@code {
+    List<User> list = new List<User>();
+    //TO DO: popola la list con il database
+}
