@@ -1,0 +1,88 @@
+﻿@page "/admin/categories"
+@using FUST.ECommerce.Service
+@inject CategoryService CategoryService
+
+<h3>Gestione Categorie</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrizione</th>
+            <th>Azioni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in categories)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => EditCategory(category)">Modifica</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteCategory(category.Id)">Elimina</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Aggiungi Categoria</h4>
+<input type="text" placeholder="Nome" @bind="newCategory.Name" class="form-control" />
+<input type="text" placeholder="Descrizione" @bind="newCategory.Description" class="form-control" />
+<button class="btn btn-success" @onclick="AddCategory">Aggiungi</button>
+
+@if (isEditing)
+{
+    <h4>Modifica Categoria</h4>
+    <input type="text" placeholder="Nome" @bind="editingCategory.Name" class="form-control" />
+    <input type="text" placeholder="Descrizione" @bind="editingCategory.Description" class="form-control" />
+    <button class="btn btn-warning" @onclick="UpdateCategory">Aggiorna</button>
+}
+
+@code {
+    private List<Category> categories = new();
+    private Category newCategory = new();
+    private Category editingCategory = new();
+    private bool isEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    private async Task AddCategory()
+    {
+        await CategoryService.AddCategoryAsync(newCategory); // Corretto il metodo chiamato
+        categories = await CategoryService.GetCategoriesAsync();
+        newCategory = new(); // Reset input
+    }
+
+    private void EditCategory(Category category)
+    {
+        isEditing = true;
+        editingCategory = new Category
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description
+            };
+    }
+
+    private async Task UpdateCategory()
+    {
+        if (editingCategory.Id != 0)
+        {
+            await CategoryService.UpdateCategoryAsync(editingCategory); // Metodo per aggiornare nel DB
+            categories = await CategoryService.GetCategoriesAsync();
+            isEditing = false;
+            editingCategory = new Category();
+        }
+    }
+
+    private async Task DeleteCategory(int id)
+    {
+        await CategoryService.DeleteCategoryAsync(id); // Metodo per eliminare dal DB
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+}
