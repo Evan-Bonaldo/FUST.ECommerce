@@ -1,8 +1,7 @@
 ﻿@page "/admin/users/list"
 @using FUST.ECommerce.Models
 <h3>Lista degli utenti</h3>
-<AuthorizeView>
-        <table>
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -22,7 +21,6 @@
                 }
             </tbody>
         </table>
-</AuthorizeView>
 @code {
     List<User> list = new List<User>();
     //TO DO: popola la list con il database
