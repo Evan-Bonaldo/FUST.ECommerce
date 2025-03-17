@@ -1,3 +1,4 @@
+
 ﻿using System.Reflection.Metadata.Ecma335;
 
 namespace FUST.ECommerce.Models
@@ -11,5 +12,6 @@ namespace FUST.ECommerce.Models
         public string EMail { get; set; } = default!;
         public string Password { get; set; } = default!;
         public DateTime RegistrationDate { get; set; }
+
     }
 }
